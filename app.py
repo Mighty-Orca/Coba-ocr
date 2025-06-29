@@ -20,7 +20,7 @@ if uploaded_file is not None:
     st.success(f"Berhasil upload: {uploaded_file.name}")
 
     # Tampilkan gambar
-    st.image(Image.open(file_path), caption="Gambar Berita", use_column_width=True)
+    st.image(Image.open(file_path), caption="Gambar Berita", use_container_width=True)
 
     # Tombol proses OCR
     if st.button("🔍 Scan OCR"):
