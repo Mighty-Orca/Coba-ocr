@@ -1,6 +1,11 @@
 from PIL import Image
 import pytesseract
+import platform
 import os
+
+# Setup Tesseract path untuk Windows
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 def extract_text_from_image(image_path):
     try:
