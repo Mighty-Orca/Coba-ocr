@@ -1,8 +1,7 @@
 import streamlit as st
 import os
-from ocr.process import extract_text_from_image
+from ocr.process import extract_text_from_image, analyze_sentiment
 from PIL import Image
-from ocr.process import analyze_sentiment
 
 # Folder upload
 UPLOAD_FOLDER = "uploads"
@@ -24,29 +23,30 @@ if uploaded_file is not None:
     st.image(Image.open(file_path), caption="Gambar Berita", use_container_width=True)
 
     # Tombol proses OCR
-   if st.button("🔍 Scan OCR"):
-    with st.spinner("Sedang memproses gambar..."):
-        extracted_text = extract_text_from_image(file_path)
-        st.session_state.extracted_text = extracted_text  # simpan hasil di session
-    st.subheader("📝 Hasil OCR:")
-    st.text_area("Teks yang Terdeteksi:", extracted_text, height=300)
+    if st.button("🔍 Scan OCR"):
+        with st.spinner("Sedang memproses gambar..."):
+            extracted_text = extract_text_from_image(file_path)
+            st.session_state.extracted_text = extracted_text
+            # reset sentimen kalau OCR baru
+            st.session_state.pop("sentimen", None)
 
-    # Kalau sudah ada teks di session_state
-    if "extracted_text" in st.session_state:
-        st.subheader("📝 Hasil OCR:")
-        st.text_area("Teks yang Terdeteksi:", st.session_state.extracted_text, height=300)
-    
-        if st.button("🔎 Analisis Sentimen"):
-            with st.spinner("Sedang menganalisis sentimen..."):
-                sentimen = analyze_sentiment(st.session_state.extracted_text)
-                st.session_state.sentimen = sentimen  # simpan hasil sentimen
-    
-    # Tampilkan hasil sentimen kalau sudah ada
-    if "sentimen" in st.session_state:
-        emoji = {
-            "Positif": "🟢",
-            "Netral": "🟡",
-            "Negatif": "🔴"
-        }
-        st.subheader("📊 Hasil Sentimen:")
-        st.markdown(f"**Sentimen Artikel:** {emoji[st.session_state.sentimen]} {st.session_state.sentimen}")
+# Tampilkan teks hasil OCR kalau sudah ada
+if "extracted_text" in st.session_state:
+    st.subheader("📝 Hasil OCR:")
+    st.text_area("Teks yang Terdeteksi:", st.session_state.extracted_text, height=300)
+
+    # Tombol analisis sentimen
+    if st.button("🔎 Analisis Sentimen"):
+        with st.spinner("Sedang menganalisis sentimen..."):
+            sentimen = analyze_sentiment(st.session_state.extracted_text)
+            st.session_state.sentimen = sentimen
+
+# Tampilkan hasil sentimen kalau sudah dianalisis
+if "sentimen" in st.session_state:
+    emoji = {
+        "Positif": "🟢",
+        "Netral": "🟡",
+        "Negatif": "🔴"
+    }
+    st.subheader("📊 Hasil Sentimen:")
+    st.markdown(f"**Sentimen Artikel:** {emoji[st.session_state.sentimen]} {st.session_state.sentimen}")
