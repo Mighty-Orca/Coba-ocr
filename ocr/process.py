@@ -2,6 +2,7 @@ from PIL import Image
 import pytesseract
 import platform
 import os
+from textblob import TextBlob
 
 # Setup Tesseract path untuk Windows
 if platform.system() == "Windows":
@@ -14,3 +15,13 @@ def extract_text_from_image(image_path):
         return text
     except Exception as e:
         return f"Terjadi error saat proses OCR: {e}"
+
+def analyze_sentiment(text):
+    blob = TextBlob(text)
+    polarity = blob.sentiment.polarity
+    if polarity > 0.1:
+        return "Positif"
+    elif polarity < -0.1:
+        return "Negatif"
+    else:
+        return "Netral"
